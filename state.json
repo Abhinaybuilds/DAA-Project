@@ -1,0 +1,60 @@
+{
+  "metadata": {
+    "project": "Smart Ambulance Finder (DAA)",
+    "numJunctions": 10,
+    "numAmbulances": 3
+  },
+  "statistics": {
+    "totalRequests": 8,
+    "activeDispatches": 3,
+    "availableAmbulances": 0,
+    "busyAmbulances": 3
+  },
+  "junctions": [
+    {"id": 0, "name": "Central Hospital", "x": 120, "y": 180, "isAccessible": 1},
+    {"id": 1, "name": "City Square", "x": 270, "y": 120, "isAccessible": 1},
+    {"id": 2, "name": "North Junction", "x": 450, "y": 90, "isAccessible": 1},
+    {"id": 3, "name": "East Market", "x": 630, "y": 170, "isAccessible": 1},
+    {"id": 4, "name": "West Highway", "x": 180, "y": 340, "isAccessible": 1},
+    {"id": 5, "name": "Metro Hub", "x": 380, "y": 260, "isAccessible": 1},
+    {"id": 6, "name": "Tech Park", "x": 580, "y": 310, "isAccessible": 1},
+    {"id": 7, "name": "South Industrial", "x": 260, "y": 480, "isAccessible": 1},
+    {"id": 8, "name": "Riverside Colony", "x": 470, "y": 470, "isAccessible": 1},
+    {"id": 9, "name": "Airport Bypass", "x": 660, "y": 460, "isAccessible": 1}
+  ],
+  "edges": [
+    {"u": 0, "v": 1, "weight": 6},
+    {"u": 0, "v": 4, "weight": 8},
+    {"u": 1, "v": 2, "weight": 5},
+    {"u": 1, "v": 5, "weight": 7},
+    {"u": 2, "v": 3, "weight": 9},
+    {"u": 2, "v": 5, "weight": 6},
+    {"u": 3, "v": 6, "weight": 8},
+    {"u": 4, "v": 5, "weight": 9},
+    {"u": 4, "v": 7, "weight": 7},
+    {"u": 5, "v": 6, "weight": 5},
+    {"u": 5, "v": 7, "weight": 10},
+    {"u": 5, "v": 8, "weight": 8},
+    {"u": 6, "v": 9, "weight": 6},
+    {"u": 7, "v": 8, "weight": 6},
+    {"u": 8, "v": 9, "weight": 7}
+  ],
+  "ambulances": [
+    {"id": 1, "code": "AMB-ALPHA", "junction": 0, "available": false, "target": 3},
+    {"id": 2, "code": "AMB-BRAVO", "junction": 2, "available": false, "target": 3},
+    {"id": 3, "code": "AMB-CHARLIE", "junction": 7, "available": false, "target": 3}
+  ],
+  "lastDispatch": {
+    "requestId": 8,
+    "patientJunction": 7,
+    "patientAccessible": true,
+    "assignedAmbulanceId": -1,
+    "destinationJunction": 7,
+    "rendezvousJunction": -1,
+    "etaMinutes": 0,
+    "status": 3,
+    "message": "All ambulances are currently BUSY. Request queued.",
+    "timestamp": "23:54:20",
+    "path": []
+  }
+}

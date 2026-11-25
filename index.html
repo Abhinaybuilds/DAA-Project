@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Ambulance Route Finder | Emergency Round-Trip</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <div class="app-wrapper">
+    
+    <!-- TOP HEADER -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="logo-icon">🚑</div>
+        <div>
+          <h1>Smart Ambulance Route Finder</h1>
+          <p class="nav-subtitle">Round-Trip Emergency Response System • Dijkstra Algorithm</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-outline" id="btnQuickReset" title="Reset Ambulances and View">
+          ↺ Reset Simulation
+        </button>
+      </div>
+    </header>
+
+    <!-- PROMINENT EMERGENCY DISPATCH BANNER -->
+    <div class="emergency-banner" id="emergencyBanner" style="display: none;">
+      <div class="banner-inner">
+        <span class="pulse-beacon"></span>
+        <span class="banner-text" id="emergencyBannerText">🚨 EMERGENCY DISPATCHED: Accident at Tech Park</span>
+      </div>
+    </div>
+
+    <!-- BROKEN ROAD ALERT BANNER -->
+    <div class="alert-banner" id="roadAlertBanner" style="display: none;">
+      <div class="alert-content">
+        <span class="alert-icon">⚠️</span>
+        <span id="alertBannerText">ROAD BROKEN: Rerouting...</span>
+      </div>
+      <button class="alert-dismiss" id="btnDismissAlert" title="Dismiss">✕</button>
+    </div>
+
+    <!-- MAIN APP LAYOUT (30% Sidebar / 70% Massive Graph) -->
+    <main class="dashboard-layout">
+      
+      <!-- SIDEBAR CONTROLS & STEP TRACKER (30%) -->
+      <aside class="sidebar">
+        
+        <!-- CARD 1: DISPATCH CONTROLS -->
+        <section class="card control-card">
+          <div class="card-header">
+            <span class="card-icon">🚨</span>
+            <h2>Emergency Dispatch</h2>
+          </div>
+          <p class="card-desc">Select an accident location. The nearest ambulance will respond and rush the patient to the closest hospital.</p>
+
+          <form id="emergencyForm" class="control-form" onsubmit="return false;">
+            
+            <!-- ACCIDENT LOCATION SELECTOR -->
+            <div class="form-group">
+              <label for="accidentNodeSelect">Accident Location:</label>
+              <select id="accidentNodeSelect" class="form-select">
+                <!-- Populated dynamically via JS -->
+              </select>
+            </div>
+
+            <!-- BROKEN ROAD TOGGLE -->
+            <div class="broken-road-section">
+              <div class="toggle-row">
+                <label class="custom-checkbox" for="brokenRoadCheckbox">
+                  <input type="checkbox" id="brokenRoadCheckbox" />
+                  <span class="checkbox-box"></span>
+                  <span class="checkbox-label">Simulate Broken Road</span>
+                </label>
+                <button type="button" class="btn btn-xs btn-outline" id="btnRandomEdge" style="display: none;" title="Pick Random Broken Road">
+                  🎲 Random Road
+                </button>
+              </div>
+
+              <!-- BROKEN EDGE SELECTOR -->
+              <div class="broken-road-dropdown" id="brokenRoadDropdownGroup" style="display: none;">
+                <label for="brokenEdgeSelect">Selected Road Obstruction:</label>
+                <select id="brokenEdgeSelect" class="form-select select-danger">
+                  <!-- Populated dynamically via JS -->
+                </select>
+                <div class="broken-road-badge">
+                  <span>⛔ Blocked: Dijkstra will bypass this segment</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- DISPATCH BUTTON -->
+            <button type="button" class="btn btn-primary btn-block btn-dispatch" id="btnDispatch">
+              <span class="btn-icon">⚡</span> Dispatch Ambulance
+            </button>
+          </form>
+        </section>
+
+        <!-- CARD 2: STEP TRACKER -->
+        <section class="card step-tracker-card">
+          <div class="card-header">
+            <span class="card-icon">🧭</span>
+            <h2>Step Tracker</h2>
+          </div>
+          <div class="step-tracker-list">
+            
+            <div class="step-item" id="trackerStep1">
+              <div class="step-bullet">1</div>
+              <div class="step-details">
+                <div class="step-name" id="step1Title">Ambulance dispatched to Accident</div>
+                <div class="step-status-sub" id="step1Status">Waiting for dispatch</div>
+              </div>
+            </div>
+
+            <div class="step-item" id="trackerStep2">
+              <div class="step-bullet">2</div>
+              <div class="step-details">
+                <div class="step-name">Patient picked up</div>
+                <div class="step-status-sub" id="step2Status">Securing at scene</div>
+              </div>
+            </div>
+
+            <div class="step-item" id="trackerStep3">
+              <div class="step-bullet">3</div>
+              <div class="step-details">
+                <div class="step-name" id="step3Title">Heading to Hospital</div>
+                <div class="step-status-sub" id="step3Status">Transporting to closest facility</div>
+              </div>
+            </div>
+
+            <div class="step-item" id="trackerStep4">
+              <div class="step-bullet">4</div>
+              <div class="step-details">
+                <div class="step-name">Arrived at Hospital</div>
+                <div class="step-status-sub" id="step4Status">Patient delivered safely</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- CARD 3: AMBULANCES STATUS -->
+        <section class="card">
+          <div class="card-header">
+            <span class="card-icon">🏥</span>
+            <h2>Ambulance Stations</h2>
+          </div>
+          <div class="ambulance-list" id="ambulanceList">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- MASSIVE GRAPH CANVAS SECTION (70%) -->
+      <section class="graph-section">
+        
+        <!-- FLOATING HUD TIMER (Top Right) & STATUS -->
+        <div class="canvas-hud">
+          <div class="hud-item mission-hud">
+            <span class="hud-label">MISSION STATUS</span>
+            <span class="hud-badge idle" id="hudStatusBadge">STANDBY</span>
+          </div>
+
+          <div class="hud-item eta-hud">
+            <span class="hud-label">TOTAL ROUND-TRIP ETA</span>
+            <span class="hud-value mono" id="hudEta">-- mins</span>
+          </div>
+
+          <div class="hud-item timer-hud">
+            <span class="hud-label">TOTAL TIME</span>
+            <span class="hud-value mono neon-timer" id="hudTimer">00:00</span>
+          </div>
+        </div>
+
+        <!-- CANVAS CONTAINER (Takes 70% of screen) -->
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="cityGraphCanvas" width="1200" height="850"></canvas>
+          
+          <!-- MAP LEGEND -->
+          <div class="map-legend">
+            <div class="legend-item"><span class="legend-dot red"></span> Hospitals: Node 0 & Node 10</div>
+            <div class="legend-item"><span class="legend-dot green"></span> Ambulance Stations: Node 2 & Node 7</div>
+            <div class="legend-item"><span class="legend-dot orange"></span> Accident Scene (Pulsing Triangle)</div>
+            <div class="legend-item"><span class="legend-line cyan-glow"></span> Traveled Path (Glowing Trail)</div>
+            <div class="legend-item"><span class="legend-line red-broken"></span> Broken Road (Obstruction)</div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
